@@ -6,7 +6,6 @@ import models.*;
 import services.CashierServiceImpl;
 import services.CustomerServiceImpl;
 import services.ManagerServiceImpl;
-
 import java.util.LinkedList;
 
 
@@ -39,68 +38,34 @@ public class Main {
 
         //Customer instances-------------------------------------------------------------------------------------
 
-        Customer customer1 = new Customer(1,"milo", 500000.0, 10);
-        Customer customer2 = new Customer(2, "milo", 50000.0, 10);
-        Customer customer3 = new Customer(3, "milo", 20000.0, 10);
-        Customer customer4 = new Customer(4, "milo", 300000.0, 20);
+        Customer customer1 = new Customer(1,"sugar", 500000.0, 20);
+        Customer customer2 = new Customer(2, "sugar", 50000.0, 10);
+        Customer customer3 = new Customer(3, "sugar", 20000.0, 10);
+        Customer customer4 = new Customer(4, "sugar", 300000.0, 20);
 
-        LinkedList<CustomerServiceImpl> customerThreadList = new LinkedList<>();
+        LinkedList<CustomerServiceImpl> customerList = new LinkedList<>();
+        store1.setCustomerQueue(customerList);
 
-        CustomerServiceImpl customerService1 = new CustomerServiceImpl(customer1, store1);
-        CustomerServiceImpl customerService2 = new CustomerServiceImpl(customer2, store1);
-        CustomerServiceImpl customerService3 = new CustomerServiceImpl(customer3, store1);
-        CustomerServiceImpl customerService4 = new CustomerServiceImpl(customer4, store1);
-
-
-//        Thread customerThread1 = new Thread(customerService1);
-//        Thread customerThread2 = new Thread(customerService2);
-//        Thread customerThread3 = new Thread(customerService3);
-//        Thread customerThread4 = new Thread(customerService4);
-
-        customerThreadList.add(customerService1);
-        customerThreadList.add(customerService2);
-        customerThreadList.add(customerService3);
-        customerThreadList.add(customerService4);
-
-//        customerThread1.start();
-//        customerThread2.start();
-//        customerThread3.start();
-//        customerThread4.start();
-
-        for(int i = 0; i< customerThreadList.size(); i++){
-            CustomerServiceImpl eachCustomerService = customerThreadList.get(i);
-            eachCustomerService.start();
-
-            Thread cashierThread = new Thread(new CashierServiceImpl(store1, staff2, eachCustomerService.getCustomer(), eachCustomerService){
-
-                @Override
-                public void run(){
-                    try {
-                        eachCustomerService.join();
-                    }catch(InterruptedException e){
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-            cashierThread.start();
-
-        }
+        customerList.add(new CustomerServiceImpl(customer1, store1));
+        customerList.add(new CustomerServiceImpl(customer2, store1));
+        customerList.add(new CustomerServiceImpl(customer3, store1));
+        customerList.add(new CustomerServiceImpl(customer4, store1));
 
 
-//        Thread cashierThread1 = new Thread(new CashierServiceImpl(store1, staff2, customer1, customerService1));
-//        Thread cashierThread2 = new Thread(new CashierServiceImpl(store1, staff2, customer2, customerService2));
-//        Thread cashierThread3 = new Thread(new CashierServiceImpl(store1, staff2, customer3, customerService3));
-//        Thread cashierThread4 = new Thread(new CashierServiceImpl(store1, staff2, customer4, customerService4));
-//
-//        cashierThread1.start();
-//        cashierThread2.start();
-//        cashierThread3.start();
-//        cashierThread4.start();
+       for(int i = 0; i < store1.getCustomerQueue().size(); i++){
+           Thread cashierThread = new Thread(
+                   new CashierServiceImpl(store1, staff2, customerList.get(i).getCustomer(), customerList.get(i)));
+
+           cashierThread.start();
+           try {
+               cashierThread.join();
+           }catch(InterruptedException e){
+               e.printStackTrace();
+           }
+       }
+
+       customerList.clear();
 
 
-//        for(Products x : store1.getProductsList() ){
-//            System.out.println(x);
-//        }
     }
 }

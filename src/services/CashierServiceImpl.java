@@ -2,11 +2,11 @@ package services;
 
 import Interfaces.CashierInterface;
 import enums.Role;
-import exceptions.AccessDenialException;
+import exceptions.*;
 import models.*;
 
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.time.LocalDate;
+
 
 public class CashierServiceImpl implements Runnable, CashierInterface {
     Store store;
@@ -33,31 +33,46 @@ public class CashierServiceImpl implements Runnable, CashierInterface {
         StringBuilder sellStatus = new StringBuilder();
 
         if(staff.getRole().equals(Role.CASHIER)){
-            if(customerService.buyProduct(store, customer).equals("Product purchased successfully by customer-" + customer.getCustomerId())){
-                for(int i =0; i< store.getProductsList().size(); i++){
-                    if(store.getProductsList().get(i).getProductName().equals(customer.getProductName().toLowerCase())){
-                        sellStatus.append(customer.getQty()).append(" units of ").append(customer.getProductName()).append(" sold to Customer-").append(customer.getCustomerId()) ;
-                        //).append(receipt.printReceipt(store, staff, customer));
+                for(Products eachProduct : store.getProductsList()){
+                    if(eachProduct.getProductName().equals(customer.getProductName().toLowerCase())) {
+                        if (eachProduct.getQuantity() == 0) {
+                            eachProduct.setStatus(new StringBuilder("OUT OF STOCK!"));
+                        } else {
+                            eachProduct.setStatus(new StringBuilder("AVAILABLE"));
+                        }
+                        if (customer.getQty() > 0 && eachProduct.getQuantity() >= customer.getQty()) {
+                            if (eachProduct.getQuantity() <= 0) return "OUT OF STOCK!";
+                            if ((eachProduct.getRatePerUnit() * customer.getQty()) <= customer.getAvailableCash()) {
+                                receipt.setCashierName(staff.getName());
+                                receipt.setDateTime(LocalDate.now());
+                                receipt.setReceiptNumber(0);
+                                receipt.setCustomerId(customer.getCustomerId());
+                                receipt.setItemName(customer.getProductName());
+                                receipt.setItemPrice(eachProduct.getRatePerUnit());
+                                receipt.setItemQty(customer.getQty());
+                                receipt.setTotalCost(eachProduct.getRatePerUnit() * customer.getQty());
 
-                        store.getProductsList().get(i).setQuantity(store.getProductsList().get(i).getQuantity() - customer.getQty());
+
+//                                sellStatus.append(customer.getQty()).append(" units of ").append(customer.getProductName()).append(" sold to Customer-").append(customer.getCustomerId()).append("\n").append(receipt);
+                                eachProduct.setQuantity(eachProduct.getQuantity() - customer.getQty());
+                                customer.setAvailableCash(customer.getAvailableCash() - (eachProduct.getRatePerUnit() * customer.getQty()));
+                                return customer.getQty() + " units of " + customer.getProductName() + " sold to customer- " + customer.getCustomerId() + "\n" + receipt;
+
+                            } else {
+                                throw new InsufficientBalanceException("You do not have sufficient fund to complete this transaction");
+                            }
+
+                        }else {
+                            throw new OutOfStockException("Product out of Stock");
+                        }
+
                     }
-
-                    if (store.getProductsList().get(i).getQuantity() == 0) {
-                        store.getProductsList().get(i).setStatus(new StringBuilder("OUT OF STOCK!"));
-                    } else {
-                        store.getProductsList().get(i).setStatus(new StringBuilder("AVAILABLE"));
-                    }
-
                 }
-
-            }else{
-                sellStatus.append("Product not sold");
-            }
-
+            throw new ProductIsNotAvaialbleEception("Product is currently unavailable, kindly check back later");
         }else{
-            sellStatus.append("Access Denied!");
+            throw new AccessDenialException("Access Denied!");
         }
-        return sellStatus.toString();
+//        return sellStatus.toString();
     }
 
     @Override

@@ -4,7 +4,6 @@ import services.CustomerServiceImpl;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
 
 public class Store {
     //FIELDS------------------------------------------------------------------>
@@ -12,7 +11,7 @@ public class Store {
     private String storeName;
     private List<Staff> staffList;
     private List<Products> productsList;
-//    private List<CustomerServiceImpl> buyQ
+    private LinkedList<CustomerServiceImpl> CustomerQueue;
     private Customer customer;
 
 
@@ -75,6 +74,13 @@ public class Store {
         this.customer = customer;
     }
 
+    public LinkedList<CustomerServiceImpl> getCustomerQueue() {
+        return CustomerQueue;
+    }
+
+    public void setCustomerQueue(LinkedList<CustomerServiceImpl> customerQueue) {
+        CustomerQueue = customerQueue;
+    }
 
     @Override
     public String toString() {
