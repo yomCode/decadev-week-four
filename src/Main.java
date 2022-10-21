@@ -43,18 +43,20 @@ public class Main {
         Customer customer3 = new Customer(3, "sugar", 20000.0, 10);
         Customer customer4 = new Customer(4, "sugar", 300000.0, 20);
 
-        LinkedList<CustomerServiceImpl> customerList = new LinkedList<>();
-        store1.setCustomerQueue(customerList);
+        LinkedList<Customer> customerList = new LinkedList<>();
 
-        customerList.add(new CustomerServiceImpl(customer1, store1));
-        customerList.add(new CustomerServiceImpl(customer2, store1));
-        customerList.add(new CustomerServiceImpl(customer3, store1));
-        customerList.add(new CustomerServiceImpl(customer4, store1));
+
+        CustomerServiceImpl customerService = new CustomerServiceImpl(store1, customerList);
+
+        customerService.joinQueue(store1, customer1);
+        customerService.joinQueue(store1, customer2);
+        customerService.joinQueue(store1, customer3);
+        customerService.joinQueue(store1, customer4);
 
 
        for(int i = 0; i < store1.getCustomerQueue().size(); i++){
            Thread cashierThread = new Thread(
-                   new CashierServiceImpl(store1, staff2, customerList.get(i).getCustomer(), customerList.get(i)));
+                   new CashierServiceImpl(store1, staff2, store1.getCustomerQueue().get(i)));
 
            cashierThread.start();
            try {
@@ -64,8 +66,9 @@ public class Main {
            }
        }
 
-       customerList.clear();
+        store1.getCustomerQueue().clear();
 
+        System.out.println(store1.getCustomerQueue().size());
 
     }
 }

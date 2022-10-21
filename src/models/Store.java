@@ -1,7 +1,5 @@
 package models;
 
-import services.CustomerServiceImpl;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,7 +9,7 @@ public class Store {
     private String storeName;
     private List<Staff> staffList;
     private List<Products> productsList;
-    private LinkedList<CustomerServiceImpl> CustomerQueue;
+    private LinkedList<Customer> CustomerQueue;
     private Customer customer;
 
 
@@ -74,11 +72,11 @@ public class Store {
         this.customer = customer;
     }
 
-    public LinkedList<CustomerServiceImpl> getCustomerQueue() {
+    public LinkedList<Customer> getCustomerQueue() {
         return CustomerQueue;
     }
 
-    public void setCustomerQueue(LinkedList<CustomerServiceImpl> customerQueue) {
+    public void setCustomerQueue(LinkedList<Customer> customerQueue) {
         CustomerQueue = customerQueue;
     }
 

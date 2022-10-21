@@ -21,8 +21,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class CashierServiceImplTest {
 
 
+
+
     @Test
-    void deadLockTest() {
+    void raceConditionTest() {
         Store store1 = new Store();
         ProductFileReaderService reader = new ProductFileReaderService();
         store1.setProductsList(reader.productList());
@@ -35,13 +37,14 @@ class CashierServiceImplTest {
         Customer customer3 = new Customer(3, "sugar", 20000.0, 10);
         Customer customer4 = new Customer(4, "sugar", 300000.0, 5);
 
-        LinkedList<CustomerServiceImpl> customerList = new LinkedList<>();
-        store1.setCustomerQueue(customerList);
+        LinkedList<Customer> customerList = new LinkedList<>();
 
-        customerList.add(new CustomerServiceImpl(customer1, store1));
-        customerList.add(new CustomerServiceImpl(customer2, store1));
-        customerList.add(new CustomerServiceImpl(customer3, store1));
-        customerList.add(new CustomerServiceImpl(customer4, store1));
+        CustomerServiceImpl customerService = new CustomerServiceImpl(store1, customerList);
+
+        customerService.joinQueue(store1, customer1);
+        customerService.joinQueue(store1, customer2);
+        customerService.joinQueue(store1, customer3);
+        customerService.joinQueue(store1, customer4);
 
         for(Products eachProduct : store1.getProductsList()){
             if(eachProduct.getProductName().equals(customer1.getProductName())) {
@@ -56,7 +59,7 @@ class CashierServiceImplTest {
             }
         }
         for(int i = 0; i < customerList.size(); i++){
-            Thread thread = new Thread(new CashierServiceImpl(store1, staff3, customerList.get(i).getCustomer(), customerList.get(i)));
+            Thread thread = new Thread(new CashierServiceImpl(store1, staff3, customerList.get(i)));
             thread.start();
         }
 
@@ -66,7 +69,7 @@ class CashierServiceImplTest {
     }
 
     @Test
-    void noDeadLockTest() {
+    void noRaceConditionTest() {
         Store store1 = new Store();
         ProductFileReaderService reader = new ProductFileReaderService();
         store1.setProductsList(reader.productList());
@@ -79,13 +82,14 @@ class CashierServiceImplTest {
         Customer customer3 = new Customer(3, "sugar", 20000.0, 10);
         Customer customer4 = new Customer(4, "sugar", 300000.0, 5);
 
-        LinkedList<CustomerServiceImpl> customerList = new LinkedList<>();
-        store1.setCustomerQueue(customerList);
+        LinkedList<Customer> customerList = new LinkedList<>();
 
-        customerList.add(new CustomerServiceImpl(customer1, store1));
-        customerList.add(new CustomerServiceImpl(customer2, store1));
-        customerList.add(new CustomerServiceImpl(customer3, store1));
-        customerList.add(new CustomerServiceImpl(customer4, store1));
+        CustomerServiceImpl customerService = new CustomerServiceImpl(store1, customerList);
+
+        customerService.joinQueue(store1, customer1);
+        customerService.joinQueue(store1, customer2);
+        customerService.joinQueue(store1, customer3);
+        customerService.joinQueue(store1, customer4);
 
         for(Products eachProduct : store1.getProductsList()){
             if(eachProduct.getProductName().equals(customer1.getProductName())) {
@@ -100,7 +104,7 @@ class CashierServiceImplTest {
             }
         }
         for(int i = 0; i < customerList.size(); i++){
-            Thread thread = new Thread(new CashierServiceImpl(store1, staff3, customerList.get(i).getCustomer(), customerList.get(i)));
+            Thread thread = new Thread(new CashierServiceImpl(store1, staff3, customerList.get(i)));
             thread.start();
             try {
                 thread.join();
@@ -127,13 +131,14 @@ class CashierServiceImplTest {
         Customer customer3 = new Customer(3, "sugar", 20000.0, 10);
         Customer customer4 = new Customer(4, "sugar", 300000.0, 20);
 
-        LinkedList<CustomerServiceImpl> customerList = new LinkedList<>();
-        store1.setCustomerQueue(customerList);
+        LinkedList<Customer> customerList = new LinkedList<>();
 
-        customerList.add(new CustomerServiceImpl(customer1, store1));
-        customerList.add(new CustomerServiceImpl(customer2, store1));
-        customerList.add(new CustomerServiceImpl(customer3, store1));
-        customerList.add(new CustomerServiceImpl(customer4, store1));
+        CustomerServiceImpl customerService = new CustomerServiceImpl(store1, customerList);
+
+        customerService.joinQueue(store1, customer1);
+        customerService.joinQueue(store1, customer2);
+        customerService.joinQueue(store1, customer3);
+        customerService.joinQueue(store1, customer4);
 
         for(Products eachProduct : store1.getProductsList()){
             if(eachProduct.getProductName().equals(customer1.getProductName())) {
@@ -147,9 +152,9 @@ class CashierServiceImplTest {
                 receipt.setTotalCost(eachProduct.getRatePerUnit() * customer1.getQty());
             }
         }
-        CustomerServiceImpl customerService = new CustomerServiceImpl(customer1, store1);
 
-        CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1, customerService);
+
+        CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1);
 
         assertEquals(customer1.getQty() + " units of " + customer1.getProductName() + " sold to customer- " + customer1.getCustomerId() + "\n" + receipt, cashierService.sellProduct(store1, staff3, customer1));
     }
@@ -169,13 +174,14 @@ class CashierServiceImplTest {
         Customer customer3 = new Customer(3, "sugar", 20000.0, 10);
         Customer customer4 = new Customer(4, "sugar", 300000.0, 20);
 
-        LinkedList<CustomerServiceImpl> customerList = new LinkedList<>();
-        store1.setCustomerQueue(customerList);
+        LinkedList<Customer> customerList = new LinkedList<>();
 
-        customerList.add(new CustomerServiceImpl(customer1, store1));
-        customerList.add(new CustomerServiceImpl(customer2, store1));
-        customerList.add(new CustomerServiceImpl(customer3, store1));
-        customerList.add(new CustomerServiceImpl(customer4, store1));
+        CustomerServiceImpl customerService = new CustomerServiceImpl(store1, customerList);
+
+        customerService.joinQueue(store1, customer1);
+        customerService.joinQueue(store1, customer2);
+        customerService.joinQueue(store1, customer3);
+        customerService.joinQueue(store1, customer4);
 
 
         for(Products eachProduct : store1.getProductsList()){
@@ -194,7 +200,7 @@ class CashierServiceImplTest {
         Throwable throwable =  assertThrows(InsufficientBalanceException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1, customerList.get(0));
+                CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1);
                 cashierService.sellProduct(store1, staff3, customer1);
             }
         });
@@ -217,13 +223,14 @@ class CashierServiceImplTest {
         Customer customer3 = new Customer(3, "sugar", 20000.0, 10);
         Customer customer4 = new Customer(4, "sugar", 300000.0, 20);
 
-        LinkedList<CustomerServiceImpl> customerList = new LinkedList<>();
-        store1.setCustomerQueue(customerList);
+        LinkedList<Customer> customerList = new LinkedList<>();
 
-        customerList.add(new CustomerServiceImpl(customer1, store1));
-        customerList.add(new CustomerServiceImpl(customer2, store1));
-        customerList.add(new CustomerServiceImpl(customer3, store1));
-        customerList.add(new CustomerServiceImpl(customer4, store1));
+        CustomerServiceImpl customerService = new CustomerServiceImpl(store1, customerList);
+
+        customerService.joinQueue(store1, customer1);
+        customerService.joinQueue(store1, customer2);
+        customerService.joinQueue(store1, customer3);
+        customerService.joinQueue(store1, customer4);
 
 
         for(Products eachProduct : store1.getProductsList()){
@@ -242,7 +249,7 @@ class CashierServiceImplTest {
         Throwable throwable =  assertThrows(OutOfStockException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1, customerList.get(0));
+                CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1);
                 cashierService.sellProduct(store1, staff3, customer1);
             }
         });
@@ -264,13 +271,14 @@ class CashierServiceImplTest {
         Customer customer3 = new Customer(3, "sugar", 20000.0, 10);
         Customer customer4 = new Customer(4, "sugar", 300000.0, 20);
 
-        LinkedList<CustomerServiceImpl> customerList = new LinkedList<>();
-        store1.setCustomerQueue(customerList);
+        LinkedList<Customer> customerList = new LinkedList<>();
 
-        customerList.add(new CustomerServiceImpl(customer1, store1));
-        customerList.add(new CustomerServiceImpl(customer2, store1));
-        customerList.add(new CustomerServiceImpl(customer3, store1));
-        customerList.add(new CustomerServiceImpl(customer4, store1));
+        CustomerServiceImpl customerService = new CustomerServiceImpl(store1, customerList);
+
+        customerService.joinQueue(store1, customer1);
+        customerService.joinQueue(store1, customer2);
+        customerService.joinQueue(store1, customer3);
+        customerService.joinQueue(store1, customer4);
 
 
         for(Products eachProduct : store1.getProductsList()){
@@ -289,7 +297,7 @@ class CashierServiceImplTest {
         Throwable throwable =  assertThrows(ProductIsNotAvaialbleEception.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1, customerList.get(0));
+                CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1);
                 cashierService.sellProduct(store1, staff3, customer1);
             }
         });
@@ -311,13 +319,14 @@ class CashierServiceImplTest {
         Customer customer3 = new Customer(3, "sugar", 20000.0, 10);
         Customer customer4 = new Customer(4, "sugar", 300000.0, 20);
 
-        LinkedList<CustomerServiceImpl> customerList = new LinkedList<>();
-        store1.setCustomerQueue(customerList);
+        LinkedList<Customer> customerList = new LinkedList<>();
 
-        customerList.add(new CustomerServiceImpl(customer1, store1));
-        customerList.add(new CustomerServiceImpl(customer2, store1));
-        customerList.add(new CustomerServiceImpl(customer3, store1));
-        customerList.add(new CustomerServiceImpl(customer4, store1));
+        CustomerServiceImpl customerService = new CustomerServiceImpl(store1, customerList);
+
+        customerService.joinQueue(store1, customer1);
+        customerService.joinQueue(store1, customer2);
+        customerService.joinQueue(store1, customer3);
+        customerService.joinQueue(store1, customer4);
 
 
         for(Products eachProduct : store1.getProductsList()){
@@ -336,7 +345,7 @@ class CashierServiceImplTest {
         Throwable throwable =  assertThrows(AccessDenialException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1, customerList.get(0));
+                CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1);
                 cashierService.sellProduct(store1, staff3, customer1);
             }
         });

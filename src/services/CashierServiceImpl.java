@@ -12,13 +12,13 @@ public class CashierServiceImpl implements Runnable, CashierInterface {
     Store store;
     Staff staff;
     Customer customer;
-    CustomerServiceImpl customerService;
+//    CustomerServiceImpl customerService;
 
-    public CashierServiceImpl(Store store, Staff staff, Customer customer, CustomerServiceImpl customerService) {
+    public CashierServiceImpl(Store store, Staff staff, Customer customer) {
         this.store = store;
         this.staff = staff;
         this.customer = customer;
-        this.customerService = customerService;
+//        this.customerService = customerService;
     }
 
     public Customer getCustomer() {
