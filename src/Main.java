@@ -38,10 +38,10 @@ public class Main {
 
         //Customer instances-------------------------------------------------------------------------------------
 
-        Customer customer1 = new Customer(1,"sugar", 500000.0, 20);
-        Customer customer2 = new Customer(2, "sugar", 50000.0, 10);
-        Customer customer3 = new Customer(3, "sugar", 20000.0, 10);
-        Customer customer4 = new Customer(4, "sugar", 300000.0, 20);
+        Customer customer1 = new Customer(1,"sugar", 2000.0, 5);
+        Customer customer2 = new Customer(2, "sugar", 50000.0, 2);
+        Customer customer3 = new Customer(3, "sugar", 20000.0, 2);
+        Customer customer4 = new Customer(4, "sugar", 300000.0, 2);
 
         LinkedList<Customer> customerList = new LinkedList<>();
 
@@ -52,6 +52,7 @@ public class Main {
         customerService.joinQueue(store1, customer2);
         customerService.joinQueue(store1, customer3);
         customerService.joinQueue(store1, customer4);
+        customerService.joinQueue(store1, customer1);
 
 
        for(int i = 0; i < store1.getCustomerQueue().size(); i++){
@@ -64,11 +65,12 @@ public class Main {
            }catch(InterruptedException e){
                e.printStackTrace();
            }
+           
        }
 
         store1.getCustomerQueue().clear();
 
-        System.out.println(store1.getCustomerQueue().size());
+//        System.out.println(store1.getCustomerQueue().size());
 
     }
 }

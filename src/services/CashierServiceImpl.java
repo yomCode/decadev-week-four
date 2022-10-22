@@ -53,7 +53,6 @@ public class CashierServiceImpl implements Runnable, CashierInterface {
                                 receipt.setTotalCost(eachProduct.getRatePerUnit() * customer.getQty());
 
 
-//                                sellStatus.append(customer.getQty()).append(" units of ").append(customer.getProductName()).append(" sold to Customer-").append(customer.getCustomerId()).append("\n").append(receipt);
                                 eachProduct.setQuantity(eachProduct.getQuantity() - customer.getQty());
                                 customer.setAvailableCash(customer.getAvailableCash() - (eachProduct.getRatePerUnit() * customer.getQty()));
                                 return customer.getQty() + " units of " + customer.getProductName() + " sold to customer- " + customer.getCustomerId() + "\n" + receipt;
@@ -72,7 +71,7 @@ public class CashierServiceImpl implements Runnable, CashierInterface {
         }else{
             throw new AccessDenialException("Access Denied!");
         }
-//        return sellStatus.toString();
+
     }
 
     @Override
