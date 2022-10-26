@@ -6,7 +6,6 @@ import enums.Sex;
 import exceptions.AccessDenialException;
 import exceptions.InsufficientBalanceException;
 import exceptions.OutOfStockException;
-import exceptions.ProductIsNotAvaialbleEception;
 import models.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -58,8 +57,8 @@ class CashierServiceImplTest {
                 receipt.setTotalCost(eachProduct.getRatePerUnit() * customer1.getQty());
             }
         }
-        for(int i = 0; i < customerList.size(); i++){
-            Thread thread = new Thread(new CashierServiceImpl(store1, staff3, customerList.get(i)));
+        for (Customer customer : customerList) {
+            Thread thread = new Thread(new CashierServiceImpl(store1, staff3, customer));
             thread.start();
         }
 
@@ -103,12 +102,12 @@ class CashierServiceImplTest {
                 receipt.setTotalCost(eachProduct.getRatePerUnit() * customer1.getQty());
             }
         }
-        for(int i = 0; i < customerList.size(); i++){
-            Thread thread = new Thread(new CashierServiceImpl(store1, staff3, customerList.get(i)));
+        for (Customer customer : customerList) {
+            Thread thread = new Thread(new CashierServiceImpl(store1, staff3, customer));
             thread.start();
             try {
                 thread.join();
-            }catch(InterruptedException e){
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -197,12 +196,9 @@ class CashierServiceImplTest {
             }
         }
 
-        Throwable throwable =  assertThrows(InsufficientBalanceException.class, new Executable() {
-            @Override
-            public void execute() throws Throwable {
-                CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1);
-                cashierService.sellProduct(store1, staff3, customer1);
-            }
+        Throwable throwable =  assertThrows(InsufficientBalanceException.class, () -> {
+            CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1);
+            cashierService.sellProduct(store1, staff3, customer1);
         });
 
         assertEquals( "You do not have sufficient fund to complete this transaction", throwable.getMessage());
@@ -246,12 +242,9 @@ class CashierServiceImplTest {
             }
         }
 
-        Throwable throwable =  assertThrows(OutOfStockException.class, new Executable() {
-            @Override
-            public void execute() throws Throwable {
-                CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1);
-                cashierService.sellProduct(store1, staff3, customer1);
-            }
+        Throwable throwable =  assertThrows(OutOfStockException.class, () -> {
+            CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1);
+            cashierService.sellProduct(store1, staff3, customer1);
         });
 
         assertEquals( "Product out of Stock", throwable.getMessage());
@@ -294,15 +287,12 @@ class CashierServiceImplTest {
             }
         }
 
-        Throwable throwable =  assertThrows(ProductIsNotAvaialbleEception.class, new Executable() {
-            @Override
-            public void execute() throws Throwable {
-                CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1);
-                cashierService.sellProduct(store1, staff3, customer1);
-            }
+        Throwable throwable =  assertThrows(IndexOutOfBoundsException.class, () -> {
+            CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1);
+            cashierService.sellProduct(store1, staff3, customer1);
         });
 
-        assertEquals( "Product is currently unavailable, kindly check back later", throwable.getMessage());
+        assertEquals( "Index 0 out of bounds for length 0", throwable.getMessage());
     }
 
     @Test
@@ -342,12 +332,9 @@ class CashierServiceImplTest {
             }
         }
 
-        Throwable throwable =  assertThrows(AccessDenialException.class, new Executable() {
-            @Override
-            public void execute() throws Throwable {
-                CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1);
-                cashierService.sellProduct(store1, staff3, customer1);
-            }
+        Throwable throwable =  assertThrows(AccessDenialException.class, () -> {
+            CashierServiceImpl cashierService = new CashierServiceImpl(store1, staff3, customer1);
+            cashierService.sellProduct(store1, staff3, customer1);
         });
 
         assertEquals( "Access Denied!", throwable.getMessage());
