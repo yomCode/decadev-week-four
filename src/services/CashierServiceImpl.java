@@ -103,65 +103,6 @@ public class CashierServiceImpl implements Runnable, CashierInterface {
 
         return sellStatus;
 
-
-//        for(Products product: store.getProductsList()){
-//
-//            Function<Customer, String> isAvailable = customer1 ->
-//                    customer1.getProductName().equalsIgnoreCase(product.getProductName()) ? "Available" : null;
-//
-//
-//            Function<Customer, Products> isQtyEnough = customer1 ->
-//                    product.getQuantity() >= customer1.getQty() ? product : null;
-//
-//            Function<Customer, Products> isFundSufficient = customer1 ->
-//                    (product.getRatePerUnit() * customer1.getQty()) <= customer1.getAvailableCash() ? product : null;
-//
-//            Function<Products, PrintReceipt> salesIsSuccessful = isAvailable.andThen().andThen()
-//
-//
-//        }
-
-
-//        if(staff.getRole().equals(Role.CASHIER)){
-//                for(Products eachProduct : store.getProductsList()){
-//                    if(eachProduct.getProductName().equals(customer.getProductName().toLowerCase())) {
-//                        if (eachProduct.getQuantity() == 0) {
-//                            eachProduct.setStatus(new StringBuilder("OUT OF STOCK!"));
-//                        } else {
-//                            eachProduct.setStatus(new StringBuilder("AVAILABLE"));
-//                        }
-//                        if (customer.getQty() > 0 && eachProduct.getQuantity() >= customer.getQty()) {
-//                            if (eachProduct.getQuantity() <= 0) return "OUT OF STOCK!";
-//                            if ((eachProduct.getRatePerUnit() * customer.getQty()) <= customer.getAvailableCash()) {
-//                                receipt.setCashierName(staff.getName());
-//                                receipt.setDateTime(LocalDate.now());
-//                                receipt.setReceiptNumber(0);
-//                                receipt.setCustomerId(customer.getCustomerId());
-//                                receipt.setItemName(customer.getProductName());
-//                                receipt.setItemPrice(eachProduct.getRatePerUnit());
-//                                receipt.setItemQty(customer.getQty());
-//                                receipt.setTotalCost(eachProduct.getRatePerUnit() * customer.getQty());
-//
-//
-//                                eachProduct.setQuantity(eachProduct.getQuantity() - customer.getQty());
-//                                customer.setAvailableCash(customer.getAvailableCash() - (eachProduct.getRatePerUnit() * customer.getQty()));
-//                                return customer.getQty() + " units of " + customer.getProductName() + " sold to customer- " + customer.getCustomerId() + "\n" + receipt;
-//
-//                            } else {
-//                                throw new InsufficientBalanceException("You do not have sufficient fund to complete this transaction");
-//                            }
-//
-//                        }else {
-//                            throw new OutOfStockException("Product out of Stock");
-//                        }
-//
-//                    }
-//                }
-//            throw new ProductIsNotAvaialbleEception("Product is currently unavailable, kindly check back later");
-//        }else{
-//            throw new AccessDenialException("Access Denied!");
-//        }
-
     }
 
 

@@ -23,7 +23,6 @@ public class CustomerServiceImpl implements CustomerInterface {
     @Override
     public void joinQueue(Store store, Customer customer){
         store.setCustomerQueue(custList);
-
         for(int i = 0; i< store.getProductsList().size(); i++){
             if(store.getProductsList().get(i).getProductName().equals(customer.getProductName())){
                 store.getCustomerQueue().add(customer);
