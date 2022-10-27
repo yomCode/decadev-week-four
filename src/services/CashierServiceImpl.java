@@ -7,9 +7,7 @@ import models.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
+import java.util.function.*;
 
 
 public class CashierServiceImpl implements Runnable, CashierInterface {
@@ -23,9 +21,9 @@ public class CashierServiceImpl implements Runnable, CashierInterface {
         this.customer = customer;
     }
 
-    private Boolean haveAccess(Staff staff){
-        return staff.getRole().equals(Role.CASHIER);
-    }
+    private final Predicate<Staff> haveAccess = staff ->
+        staff.getRole().equals(Role.CASHIER);
+
 
     private Products isAvailable(Store store, Customer customer) {
         Products theProduct;
@@ -46,7 +44,7 @@ public class CashierServiceImpl implements Runnable, CashierInterface {
             (isAvailable(store, customer).getRatePerUnit() * customer.getQty()) <= customer.getAvailableCash();
 
 
-    private final BiFunction<Store, Customer, PrintReceipt> issueReceipt = (store, customer) -> {
+   private final BiFunction<Store, Customer, PrintReceipt> issueReceipt = (store, customer) -> {
         PrintReceipt receipt = new PrintReceipt();
 
         receipt.setCashierName(staff.getName());
@@ -59,15 +57,17 @@ public class CashierServiceImpl implements Runnable, CashierInterface {
         receipt.setTotalCost(isAvailable(store, customer).getRatePerUnit() * customer.getQty());
 
         return receipt;
-    };
+   };
 
-    private void updateBalance(Store store, Customer customer) {
-        customer.setAvailableCash(customer.getAvailableCash() - (isAvailable(store, customer).getRatePerUnit() * customer.getQty()));
-    }
+    private final BiConsumer<Store, Customer> updateBalance = (store, customer) ->
+            customer.setAvailableCash(customer.getAvailableCash() -
+                    (isAvailable(store, customer).getRatePerUnit() * customer.getQty()));
 
-    private void updateQty(Store store, Customer customer) {
-        isAvailable(store, customer).setQuantity(isAvailable(store, customer).getQuantity() - customer.getQty());
-    }
+
+
+    private final BiConsumer<Store, Customer> updateQty = (store, customer) ->
+            isAvailable(store, customer).setQuantity(isAvailable(store, customer)
+                    .getQuantity() - customer.getQty());
 
     private final Function<Store, String> productAvailabilityStatus = Store ->
             isAvailable(store, customer).getQuantity() == 0 ? "AVAILABLE" : "OUT OF STOCK";
@@ -78,14 +78,14 @@ public class CashierServiceImpl implements Runnable, CashierInterface {
 
         String sellStatus = "";
 
-        if(haveAccess(staff).equals(true)){
+        if(haveAccess.test(staff)){
             isAvailable(store,customer);
             productAvailabilityStatus.apply(store);
             if(enoughQtyAvailable.test(store,customer)){
 
                 if(fundIsEnough.test(store,customer)){
-                    updateQty(store,customer);
-                    updateBalance(store,customer);
+                    updateQty.accept(store,customer);
+                    updateBalance.accept(store,customer);
 
                     sellStatus += customer.getQty() + " units of " + customer.getProductName()
                             + " sold to customer- " + customer.getCustomerId() + "\n" + issueReceipt.apply(store,customer);
