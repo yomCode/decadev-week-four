@@ -38,7 +38,7 @@ public class Main {
 
         //Customer instances-------------------------------------------------------------------------------------
 
-        Customer customer1 = new Customer(1,"sugar", 2000.0, 5);
+        Customer customer1 = new Customer(1,"monster", 4000.0, 5);
         Customer customer2 = new Customer(2, "sugar", 50000.0, 2);
         Customer customer3 = new Customer(3, "sugar", 20000.0, 2);
         Customer customer4 = new Customer(4, "sugar", 300000.0, 2);
